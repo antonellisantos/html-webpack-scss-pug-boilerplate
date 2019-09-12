@@ -1,0 +1,72 @@
+@mixin between-sizes($lower, $upper) {
+  @if map-has-key($breakpoints, $lower) and map-has-key($breakpoints, $upper) {
+    $lower-breakpoint: map-get($breakpoints, $lower);
+    $upper-breakpoint: map-get($breakpoints, $upper);
+
+    @media (min-width: $lower-breakpoint) and (max-width: ($upper-breakpoint)) {
+      @content;
+    }
+  }
+
+  @else {
+    @media (min-width: $lower) and (max-width: ($upper)) {
+      @content;
+    }
+  }
+}
+
+@mixin for-size($breakpoint, $direction:down) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+
+    @if $direction==up {
+      @media (min-width: $breakpoint-value) {
+        @content;
+      }
+    }
+
+    @else if $direction==down {
+      @media (max-width: $breakpoint-value) {
+        @content;
+      }
+    }
+
+    @else if $direction==only {
+      @include between-sizes($breakpoint-value, map-get($breakpoints, $breakpoint+'-lg')) {
+        @content;
+      }
+    }
+
+    @else {
+      @warn "A diração escolhida `#{$direction}`não é permitida.";
+    }
+  }
+
+  @else if type_of($breakpoint)==number and unit($breakpoint)==px or unit($breakpoint)==em or unit($breakpoint)==rem {
+    @if $direction==up {
+      @media (min-width: $breakpoint) {
+        @content;
+      }
+    }
+
+    @else if $direction==down {
+      @media (max-width: $breakpoint) {
+        @content;
+      }
+    }
+
+    @else {
+      @warn "A diração escolhida `#{$direction}`não é permitida para breakpoints personalizados.";
+    }
+  }
+
+  @else {
+    @warn "Não foi possível obter nenhum valor de `#{$breakpoint}`. Ele não está definido no mapa `$breakpoints` ou é um número inválido de px, em ou rem.";
+  }
+}
+
+@mixin hide-on($breakpoint, $direction: down) {
+  @include for-size($breakpoint, $direction) {
+    display: none !important;
+  }
+}

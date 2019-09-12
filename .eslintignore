@@ -1,0 +1,5 @@
+.gitignore
+config/*
+dist/*
+node_modules/
+webpack/*
